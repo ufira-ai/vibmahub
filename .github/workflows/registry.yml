@@ -1,0 +1,137 @@
+name: Regenerate Registry
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "skills/**"
+
+permissions:
+  contents: write
+
+jobs:
+  build-registry:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate registry.json
+        run: |
+          node - << 'EOF'
+          const fs   = require('fs');
+          const path = require('path');
+
+          // ── YAML frontmatter parser (no dependencies) ──────────────────────
+          function parseFrontmatter(content) {
+            const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+            if (!match) return null;
+
+            const lines  = match[1].split(/\r?\n/);
+            const result = {};
+
+            for (const line of lines) {
+              const colonIdx = line.indexOf(':');
+              if (colonIdx === -1) continue;
+
+              const key = line.slice(0, colonIdx).trim();
+              let   val = line.slice(colonIdx + 1).trim();
+
+              if (val.startsWith('[') && val.endsWith(']')) {
+                // Inline YAML array: [a, b, "c"]
+                result[key] = val
+                  .slice(1, -1)
+                  .split(',')
+                  .map(s => s.trim().replace(/^["']|["']$/g, ''))
+                  .filter(Boolean);
+              } else {
+                // Scalar — strip surrounding quotes
+                result[key] = val.replace(/^["']|["']$/g, '');
+              }
+            }
+
+            return result;
+          }
+
+          // ── Recursively find all SKILL.md files ────────────────────────────
+          function findSkillFiles(dir) {
+            const results = [];
+            for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+              const full = path.join(dir, entry.name);
+              if (entry.isDirectory()) {
+                results.push(...findSkillFiles(full));
+              } else if (entry.name === 'SKILL.md') {
+                results.push(full);
+              }
+            }
+            return results;
+          }
+
+          // ── Build registry ─────────────────────────────────────────────────
+          const skillsDir  = path.join(process.cwd(), 'skills');
+          const skillFiles = findSkillFiles(skillsDir);
+
+          const skills = [];
+
+          for (const filePath of skillFiles) {
+            const content = fs.readFileSync(filePath, 'utf8');
+            const fm      = parseFrontmatter(content);
+
+            if (!fm) {
+              console.warn('Skipping (no frontmatter):', filePath);
+              continue;
+            }
+
+            // Derive slug from directory name directly under skills/
+            const relative = path.relative(skillsDir, filePath);  // e.g. "button-system/SKILL.md"
+            const slug     = relative.split(path.sep)[0];
+
+            skills.push({
+              slug,
+              title:       fm.title       || slug,
+              version:     fm.version     || '1.0.0',
+              description: fm.description || '',
+              author:      fm.author      || '',
+              tags:        Array.isArray(fm.tags)  ? fm.tags  : [],
+              tools:       Array.isArray(fm.tools) ? fm.tools : [],
+              vibmaMin:    fm.vibma_min   || '0.1.0',
+              path:        ('skills/' + relative).replace(/\\/g, '/')
+            });
+          }
+
+          // Sort alphabetically by slug
+          skills.sort((a, b) => a.slug.localeCompare(b.slug));
+
+          const registry = {
+            version:   1,
+            updatedAt: new Date().toISOString(),
+            skills
+          };
+
+          fs.writeFileSync(
+            path.join(process.cwd(), 'registry.json'),
+            JSON.stringify(registry, null, 2) + '\n'
+          );
+
+          console.log('registry.json written with', skills.length, 'skill(s):');
+          skills.forEach(s => console.log(' -', s.slug, '@', s.version));
+          EOF
+
+      - name: Commit and push registry.json
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add registry.json
+
+          # Only commit if there are actual changes
+          if git diff --cached --quiet; then
+            echo "registry.json unchanged — nothing to commit"
+          else
+            git commit -m "chore: regenerate registry.json [skip ci]"
+            git push
+          fi
