@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-03-05T00:00:00.000Z",
+  "updatedAt": "2026-03-05T13:38:23.982Z",
   "skills": [
     {
       "slug": "button-system",
@@ -8,8 +8,17 @@
       "version": "1.0.0",
       "description": "Build a complete multi-variant button component system with primary, secondary, danger, and ghost styles across small, medium, and large sizes.",
       "author": "ufira-ai",
-      "tags": ["components", "buttons", "ui"],
-      "tools": ["create_frame", "create_text", "styles", "components"],
+      "tags": [
+        "components",
+        "buttons",
+        "ui"
+      ],
+      "tools": [
+        "create_frame",
+        "create_text",
+        "styles",
+        "components"
+      ],
       "vibmaMin": "0.1.0",
       "path": "skills/button-system/SKILL.md"
     },
@@ -19,8 +28,19 @@
       "version": "1.0.0",
       "description": "Build a card component with an image placeholder, title, body text, and a CTA button instance using auto-layout and exposed text properties.",
       "author": "ufira-ai",
-      "tags": ["components", "cards", "layout"],
-      "tools": ["create_frame", "create_text", "components", "styles", "variables", "instances"],
+      "tags": [
+        "components",
+        "cards",
+        "layout"
+      ],
+      "tools": [
+        "create_frame",
+        "create_text",
+        "components",
+        "styles",
+        "variables",
+        "instances"
+      ],
       "vibmaMin": "0.1.0",
       "path": "skills/card-component/SKILL.md"
     },
@@ -30,8 +50,15 @@
       "version": "1.0.0",
       "description": "Build a semantic color system with primitive paint styles and semantic design tokens as Figma variables supporting light and dark modes.",
       "author": "ufira-ai",
-      "tags": ["design-tokens", "colors", "variables"],
-      "tools": ["styles", "variables"],
+      "tags": [
+        "design-tokens",
+        "colors",
+        "variables"
+      ],
+      "tools": [
+        "styles",
+        "variables"
+      ],
       "vibmaMin": "0.1.0",
       "path": "skills/color-system/SKILL.md"
     },
@@ -41,8 +68,17 @@
       "version": "1.0.0",
       "description": "Run a systematic design audit using lint_node across an entire selection or page, group issues by rule, and produce a prioritized report.",
       "author": "ufira-ai",
-      "tags": ["audit", "lint", "quality"],
-      "tools": ["lint_node", "get_node_info", "get_selection", "search_nodes"],
+      "tags": [
+        "audit",
+        "lint",
+        "quality"
+      ],
+      "tools": [
+        "lint_node",
+        "get_node_info",
+        "get_selection",
+        "search_nodes"
+      ],
       "vibmaMin": "0.1.0",
       "path": "skills/design-audit/SKILL.md"
     },
@@ -52,8 +88,17 @@
       "version": "1.0.0",
       "description": "Build a WRAP auto-layout icon grid with 24×24 icon frames, a base icon component, and instanced icons arranged in a responsive wrap layout.",
       "author": "ufira-ai",
-      "tags": ["icons", "layout", "components"],
-      "tools": ["create_frame", "create_shape", "components", "patch_nodes"],
+      "tags": [
+        "icons",
+        "layout",
+        "components"
+      ],
+      "tools": [
+        "create_frame",
+        "create_shape",
+        "components",
+        "patch_nodes"
+      ],
       "vibmaMin": "0.1.0",
       "path": "skills/icon-grid/SKILL.md"
     }
